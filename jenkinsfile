@@ -22,7 +22,7 @@ pipeline {
             steps {
                 echo 'Testing...'
                 // Ejecutar pruebas
-                sh 'python -m unittest discover -s .'
+                sh 'python test_app.py'
             }
             post {
                 always {
