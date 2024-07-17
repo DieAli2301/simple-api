@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         APP_NAME = 'simple-api'
-        REPO_URL = 'https://github.com/usuario/repositorio.git'
+        REPO_URL = 'https://github.com/DieAli2301/simple-api.git'
     }
     stages {
         stage('Checkout') {
