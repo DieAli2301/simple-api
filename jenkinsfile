@@ -1,52 +1,58 @@
 pipeline {
     agent any
+
     environment {
-        APP_NAME = 'simple-api'
-        REPO_URL = 'https://github.com/DieAli2301/simple-api.git'
+        PYTHON_ENV = 'venv' // Nombre del entorno virtual
+        PATH = "${env.WORKSPACE}/${PYTHON_ENV}/bin:${env.PATH}"
     }
+
     stages {
         stage('Checkout') {
             steps {
-                // Clonar el repositorio de Git
-                git url: "${REPO_URL}"
+                // Clona el repositorio
+                git 'https://github.com/DieAli2301/simple-api.git'
             }
         }
-        stage('Build') {
+
+        stage('Setup Python Environment') {
             steps {
-                echo 'Building...'
-                // Instalar dependencias
+                // Configura el entorno virtual de Python
+                sh 'python3 -m venv ${PYTHON_ENV}'
+                sh 'source ${PYTHON_ENV}/bin/activate'
+                sh 'pip install --upgrade pip'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                // Instala las dependencias del proyecto
                 sh 'pip install -r requirements.txt'
             }
         }
-        stage('Test') {
+
+        stage('Run Tests') {
             steps {
-                echo 'Testing...'
-                // Ejecutar pruebas
-                sh 'python test_app.py'
-            }
-            post {
-                always {
-                    junit '**/test-reports/*.xml'
-                }
+                // Ejecuta las pruebas unitarias
+                sh 'pytest --junitxml=test-results.xml'
             }
         }
-        stage('Deploy') {
+
+        stage('Build') {
             steps {
-                echo 'Deploying...'
-                // Comando para desplegar tu aplicación (ajusta según tu entorno)
-                sh '''
-                docker build -t ${APP_NAME} .
-                docker run -d -p 5000:5000 --name ${APP_NAME} ${APP_NAME}
-                '''
+                // Construye el proyecto (ajusta este comando según sea necesario)
+                // Aquí puedes añadir comandos de construcción específicos si tu proyecto los requiere
+                sh 'echo "Build step (customize as needed)"'
             }
         }
     }
+
     post {
-        success {
-            echo 'Pipeline completed successfully'
-        }
-        failure {
-            echo 'Pipeline failed'
+        always {
+            // Archiva los resultados de las pruebas
+            junit 'test-results.xml'
+
+            // Limpia el workspace después de la ejecución
+            cleanWs()
         }
     }
 }

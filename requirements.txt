@@ -1,7 +1,4 @@
-Flask
-
-python app.py
-
-
-python test_app.py
-
+fastapi
+uvicorn
+pytest
+pytest-cov
